@@ -1,4 +1,5 @@
-# Una brújula del silencio – Delos  
+# Una brújula del silencio – Delos 
+
 Autor: Stella P.  
 Fecha de desarrollo: Agosto-septiembre 2025.  
 
