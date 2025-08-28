@@ -1,7 +1,7 @@
 # Pasos para realizar los experimentos
 
 Autor: Stella  
-FEcha_ñsalkdlaksd
+Fecha: ñsalkdlaksd
 
 ## Servidor
 
