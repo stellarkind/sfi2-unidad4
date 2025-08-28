@@ -1,7 +1,7 @@
-# Pasos para realizar los experimentos
-Una brújula del silencio – Delos
-Autor: Stella P.
-Fecha de desarrollo: Agosto-septiembre 2025.
+# Pasos para realizar los experimentos  
+Una brújula del silencio – Delos  
+Autor: Stella P.  
+Fecha de desarrollo: Agosto-septiembre 2025.  
 
 ## Sobre el proyecto
 Proyecto desarrollado bajo el marco de la clase Sistemas Físicos Interactivos 2, Universidad Pontificia Bolivariana. Utilizando como referente para el desarrollo visual la canción ***"Delos"*** del artista colombiano **Nerón Arkano**, quien es dueño de la totalidad de los derechos de dicha canción, utilizada en este proyecto con fines unicamente de **exploración académica**.
