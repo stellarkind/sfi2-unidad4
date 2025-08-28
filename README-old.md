@@ -20,6 +20,8 @@ De nuevo, la comunicación entre los dos sitios se realizará mediante socket.io
 
 Los pasos para ejecutar la aplicación son:
 
+
+
 * Clonar el repositorio en el codespaces.
 * Instalar las dependencias con el comando
 
