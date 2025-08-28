@@ -1,5 +1,8 @@
 # Pasos para realizar los experimentos
 
+Autor: Stella
+
+
 ## Servidor
 
 Este proyecto implementa un servidor web al que añade funcionalidades de Websocket usando socket.io. 
