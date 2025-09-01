@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.0/lib/p5.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="sketch.js"></script>
-    <title>Remoto p5.js Application</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.0/lib/p5.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="sketch.js"></script>
+  <title>Remoto - Control de Naves</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      padding: 20px;
+    }
+    .slider-container {
+      margin: 20px 0;
+    }
+    input[type="range"] {
+      width: 80%;
+    }
+  </style>
 </head>
-<body></body>
+<body>
+  <h2>Control de colores</h2>
+  <div class="slider-container">
+    <label>Nave 1</label><br />
+    <input type="range" id="slider1" min="0" max="360" />
+  </div>
+  <div class="slider-container">
+    <label>Nave 2</label><br />
+    <input type="range" id="slider2" min="0" max="360" />
+  </div>
+</body>
 </html>

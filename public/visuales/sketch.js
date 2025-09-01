@@ -1,87 +1,104 @@
 let socket;
-let circleX = 200;
-let circleY = 200;
-let squareX = 100;
-let squareY = 100;
-let purple;
-let currentEffect = 'normal';
+let circleX = 200, circleY = 200;
+let squareX = 100, squareY = 100;
+
+let nave1Color, nave2Color;
+let mode = "normal"; // normal | outline | blink | mirror
+
+// Audio
+let song, fft;
+let spectrum = [];
+
+function preload() {
+  song = loadSound("delos.mp3"); // el mp3 debe estar en la carpeta visuales/
+}
 
 function setup() {
-    purple = color(188, 155, 243);
-    createCanvas(400, 400);
-    background(220);
+  createCanvas(600, 600);
+  colorMode(HSB, 360, 100, 100);
+  nave1Color = color(200, 80, 80);
+  nave2Color = color(300, 80, 80);
 
-    socket = io(); 
+  fft = new p5.FFT();
 
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
+  socket = io();
+  socket.on("message", (data) => {
+    try {
+      let parsedData = JSON.parse(data);
 
-    socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
-        try {
-            let parsedData = JSON.parse(data);
-            
-            if (parsedData.type === 'touch') {
-                circleX = parsedData.x;
-                circleY = parsedData.y;
-            } else if(parsedData.type === 'touch-2') {
-                squareX = parsedData.x;
-                squareY = parsedData.y;
-            } else if(parsedData.type === 'color') {
-                let r = Math.max(0, Math.min(255, parsedData.x));
-                let g = Math.max(0, Math.min(255, parsedData.y));
-                purple = color(r, g, 200);
-            } else if(parsedData.type === 'effect') {
-                currentEffect = parsedData.value;
-            }
-        } catch (e) {
-            console.error("Error parsing received JSON:", e);
-        }
-    });    
+      if (parsedData.type === "touch") {
+        circleX = parsedData.x;
+        circleY = parsedData.y;
+      } else if (parsedData.type === "touch-2") {
+        squareX = parsedData.x;
+        squareY = parsedData.y;
+      } else if (parsedData.type === "color-1") {
+        nave1Color = color(parsedData.hue, 80, 100);
+      } else if (parsedData.type === "color-2") {
+        nave2Color = color(parsedData.hue, 80, 100);
+      } else if (parsedData.type === "mode") {
+        mode = parsedData.value;
+      }
+    } catch (e) {
+      console.error("Error parsing JSON:", e);
+    }
+  });
 
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
-    });
+  if (!song.isPlaying()) {
+    song.loop();
+  }
 }
 
 function draw() {
-    background(220);
+  spectrum = fft.analyze();
 
-    if (currentEffect === 'normal') {
-        fill(purple);
-        noStroke();
-        ellipse(circleX, circleY, 50, 50);
-        rect(squareX, squareY, 100, 50);
+  // Dividimos en rangos de frecuencia
+  let bass = fft.getEnergy("bass");
+  let mid = fft.getEnergy("mid");
+  let treble = fft.getEnergy("treble");
 
-    } else if (currentEffect === 'outline') {
-        noFill();
-        stroke(purple);
-        strokeWeight(4);
-        ellipse(circleX, circleY, 60, 60);
-        rect(squareX, squareY, 100, 50);
+  // Fondo reactivo
+  background(bass, 60, map(mid, 0, 255, 20, 100));
 
-    } else if (currentEffect === 'blink') {
-        if (frameCount % 30 < 15) {
-            fill(purple);
-            noStroke();
-            ellipse(circleX, circleY, 50, 50);
-            rect(squareX, squareY, 100, 50);
-        }
+  // Blink mode: parpadeo con agudos
+  if (mode === "blink" && treble > 200) {
+    background(0, 0, 100);
+  }
 
-    } else if (currentEffect === 'mirror') {
-        // Dibuja las figuras normales
-        fill(purple);
-        noStroke();
-        ellipse(circleX, circleY, 50, 50);
-        rect(squareX, squareY, 100, 50);
+  push();
+  if (mode === "mirror") {
+    translate(width, 0);
+    scale(-1, 1);
+  }
 
-        // Dibuja copias espejadas
-        ellipse(width - circleX, circleY, 50, 50);
-        rect(width - squareX - 100, squareY, 100, 50);
-    }
+  noStroke();
+  if (mode === "outline") {
+    noFill();
+    strokeWeight(3);
+  }
+
+  // Dibujar nave 1 (círculo)
+  if (mode === "outline") {
+    stroke(nave1Color);
+  } else {
+    fill(nave1Color);
+  }
+  ellipse(circleX, circleY, 60);
+
+  // Dibujar nave 2 (rectángulo)
+  if (mode === "outline") {
+    stroke(nave2Color);
+  } else {
+    fill(nave2Color);
+  }
+  rect(squareX, squareY, 80, 50, 10);
+
+  pop();
+}
+
+function keyPressed() {
+  if (key === "1") mode = "normal";
+  if (key === "2") mode = "outline";
+  if (key === "3") mode = "blink";
+  if (key === "4") mode = "mirror";
 }
