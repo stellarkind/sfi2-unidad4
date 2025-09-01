@@ -1,27 +1,35 @@
 let socket;
-let circleX = 200, circleY = 200;
-let squareX = 100, squareY = 100;
-
-let nave1Color, nave2Color;
-let mode = "normal"; // normal | outline | blink | mirror
-
-// Audio
-let song, fft;
-let spectrum = [];
+let circleX = 200;
+let circleY = 200;
+let squareX = 100;
+let squareY = 100;
+let purple;
+let song;
+let fft;
+let isSongPlaying = false;
 
 function preload() {
-  song = loadSound("delos.mp3"); // el mp3 debe estar en la carpeta visuales/
+  // Asegúrate que el archivo esté en visuales/delos.mp3
+  song = loadSound("delos.mp3", 
+    () => console.log("Canción cargada ✔"), 
+    () => console.error("Error cargando la canción ❌")
+  );
 }
 
 function setup() {
-  createCanvas(600, 600);
-  colorMode(HSB, 360, 100, 100);
-  nave1Color = color(200, 80, 80);
-  nave2Color = color(300, 80, 80);
+  createCanvas(600, 400);
+  purple = color(188, 155, 243);
 
+  // Inicializar análisis de audio
   fft = new p5.FFT();
 
+  // Conexión al servidor
   socket = io();
+
+  socket.on("connect", () => {
+    console.log("Connected to server");
+  });
+
   socket.on("message", (data) => {
     try {
       let parsedData = JSON.parse(data);
@@ -33,72 +41,48 @@ function setup() {
         squareX = parsedData.x;
         squareY = parsedData.y;
       } else if (parsedData.type === "color-1") {
-        nave1Color = color(parsedData.hue, 80, 100);
+        let r = Math.max(0, Math.min(255, parsedData.value));
+        purple = color(r, green(purple), blue(purple));
       } else if (parsedData.type === "color-2") {
-        nave2Color = color(parsedData.hue, 80, 100);
-      } else if (parsedData.type === "mode") {
-        mode = parsedData.value;
+        let g = Math.max(0, Math.min(255, parsedData.value));
+        purple = color(red(purple), g, blue(purple));
       }
     } catch (e) {
       console.error("Error parsing JSON:", e);
     }
   });
-
-  if (!song.isPlaying()) {
-    song.loop();
-  }
 }
 
 function draw() {
-  spectrum = fft.analyze();
+  background(20);
 
-  // Dividimos en rangos de frecuencia
+  if (!isSongPlaying) {
+    // Pantalla de espera
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    text("Haz clic para iniciar la canción", width / 2, height / 2);
+    return;
+  }
+
+  // Analizar el sonido
+  let spectrum = fft.analyze();
   let bass = fft.getEnergy("bass");
-  let mid = fft.getEnergy("mid");
-  let treble = fft.getEnergy("treble");
 
-  // Fondo reactivo
-  background(bass, 60, map(mid, 0, 255, 20, 100));
+  // Fondo dinámico según bajo
+  background(map(bass, 0, 255, 20, 100), 50, 100);
 
-  // Blink mode: parpadeo con agudos
-  if (mode === "blink" && treble > 200) {
-    background(0, 0, 100);
-  }
-
-  push();
-  if (mode === "mirror") {
-    translate(width, 0);
-    scale(-1, 1);
-  }
-
+  // Dibujar figuras
+  fill(purple);
   noStroke();
-  if (mode === "outline") {
-    noFill();
-    strokeWeight(3);
-  }
-
-  // Dibujar nave 1 (círculo)
-  if (mode === "outline") {
-    stroke(nave1Color);
-  } else {
-    fill(nave1Color);
-  }
-  ellipse(circleX, circleY, 60);
-
-  // Dibujar nave 2 (rectángulo)
-  if (mode === "outline") {
-    stroke(nave2Color);
-  } else {
-    fill(nave2Color);
-  }
-  rect(squareX, squareY, 80, 50, 10);
-
-  pop();
+  ellipse(circleX, circleY, 50, 50);
+  rect(squareX, squareY, 100, 50);
 }
 
-function keyPressed() {
-  if (key === "1") mode = "normal";
-  if (key === "2") mode = "outline";
-  if (key === "3") mode = "blink";
-  if (key === "4") mode = "mirror";
+// Reproducir canción al primer clic
+function mousePressed() {
+  if (!isSongPlaying) {
+    song.loop();
+    isSongPlaying = true;
+  }
 }
