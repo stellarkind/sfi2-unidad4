@@ -1,49 +1,88 @@
 let socket;
 let circleX = 200;
 let circleY = 200;
-const port = 3000;
+let squareX = 100;
+let squareY = 100;
+let purple;
+let song;
+let fft;
+let isSongPlaying = false;
 
+function preload() {
+  // Asegúrate que el archivo esté en visuales/delos.mp3
+  song = loadSound("delos.mp3", 
+    () => console.log("Canción cargada ✔"), 
+    () => console.error("Error cargando la canción ❌")
+  );
+}
 
 function setup() {
-    createCanvas(300, 400);
-    background(220);
+  createCanvas(600, 400);
+  purple = color(188, 155, 243);
 
-    //let socketUrl = 'http://localhost:3000';
-    socket = io(); 
+  // Inicializar análisis de audio
+  fft = new p5.FFT();
 
-    // Evento de conexión exitosa
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
+  // Conexión al servidor
+  socket = io();
 
-    // Recibir mensaje del servidor
-    socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
-        try {
-            let parsedData = JSON.parse(data);
-            /*
-            if (parsedData && parsedData.type === 'touch') {
-                circleX = parsedData.x;
-                circleY = parsedData.y;
-            }
-            */
-        } catch (e) {
-            console.error("Error parsing received JSON:", e);
-        }
-    });    
+  socket.on("connect", () => {
+    console.log("Connected to server");
+  });
 
-    // Evento de desconexión
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
+  socket.on("message", (data) => {
+    try {
+      let parsedData = JSON.parse(data);
 
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
-    });
+      if (parsedData.type === "touch") {
+        circleX = parsedData.x;
+        circleY = parsedData.y;
+      } else if (parsedData.type === "touch-2") {
+        squareX = parsedData.x;
+        squareY = parsedData.y;
+      } else if (parsedData.type === "color-1") {
+        let r = Math.max(0, Math.min(255, parsedData.value));
+        purple = color(r, green(purple), blue(purple));
+      } else if (parsedData.type === "color-2") {
+        let g = Math.max(0, Math.min(255, parsedData.value));
+        purple = color(red(purple), g, blue(purple));
+      }
+    } catch (e) {
+      console.error("Error parsing JSON:", e);
+    }
+  });
 }
 
 function draw() {
-    background(220);
-    fill(255, 0, 0);
-    ellipse(circleX, circleY, 50, 50);
+  background(20);
+
+  if (!isSongPlaying) {
+    // Pantalla de espera
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    text("Haz clic para iniciar la canción", width / 2, height / 2);
+    return;
+  }
+
+  // Analizar el sonido
+  let spectrum = fft.analyze();
+  let bass = fft.getEnergy("bass");
+
+  // Fondo dinámico según bajo
+  background(map(bass, 0, 255, 20, 100), 50, 100);
+
+  // Dibujar figuras
+  fill(purple);
+  noStroke();
+  ellipse(circleX, circleY, 50, 50);
+  rect(squareX, squareY, 100, 50);
+}
+
+// Reproducir canción al primer clic
+function mousePressed() {
+  if (!isSongPlaying) {
+    song.loop();
+    isSongPlaying = true;
+  }
 }
