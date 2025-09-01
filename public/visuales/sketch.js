@@ -1,12 +1,14 @@
 let socket;
 let circleX = 200;
 let circleY = 200;
-let circleSize = 50;
+let squareX = 100;
+let squareY = 100;
+let purple;
 let currentEffect = 'normal';
-let currentColor = [255, 0, 0];
 
 function setup() {
-    createCanvas(600, 400);
+    purple = color(188, 155, 243);
+    createCanvas(400, 400);
     background(220);
 
     socket = io(); 
@@ -16,46 +18,59 @@ function setup() {
     });
 
     socket.on('message', (data) => {
+        console.log(`Received message: ${data}`);
         try {
             let parsedData = JSON.parse(data);
-
+            
             if (parsedData.type === 'touch') {
                 circleX = parsedData.x;
                 circleY = parsedData.y;
-            }
-            if (parsedData.type === 'touch-2') {
-                circleSize = map(parsedData.x, 0, width, 30, 100);
-            }
-            if (parsedData.type === 'color') {
-                currentColor = [random(255), random(255), random(255)];
-            }
-            if (parsedData.type === 'effect') {
+            } else if(parsedData.type === 'touch-2') {
+                squareX = parsedData.x;
+                squareY = parsedData.y;
+            } else if(parsedData.type === 'color') {
+                let r = Math.max(0, Math.min(255, parsedData.x));
+                let g = Math.max(0, Math.min(255, parsedData.y));
+                purple = color(r, g, 200);
+            } else if(parsedData.type === 'effect') {
                 currentEffect = parsedData.value;
             }
         } catch (e) {
             console.error("Error parsing received JSON:", e);
         }
+    });    
+
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('Socket.IO error:', error);
     });
 }
 
 function draw() {
-    background(20);
+    background(220);
 
     if (currentEffect === 'normal') {
-        fill(...currentColor);
-        ellipse(circleX, circleY, circleSize, circleSize);
+        fill(purple);
+        noStroke();
+        ellipse(circleX, circleY, 50, 50);
+        rect(squareX, squareY, 100, 50);
     } 
-    else if (currentEffect === 'waves') {
+    else if (currentEffect === 'outline') {
         noFill();
-        stroke(...currentColor);
-        for (let i = 0; i < 5; i++) {
-            ellipse(circleX, circleY, circleSize + i*20, circleSize + i*20);
-        }
+        stroke(purple);
+        strokeWeight(3);
+        ellipse(circleX, circleY, 60, 60);
+        rect(squareX, squareY, 100, 50);
     } 
     else if (currentEffect === 'blink') {
         if (frameCount % 30 < 15) {
-            fill(...currentColor);
-            ellipse(circleX, circleY, circleSize, circleSize);
+            fill(purple);
+            noStroke();
+            ellipse(circleX, circleY, 50, 50);
+            rect(squareX, squareY, 100, 50);
         }
     }
 }
