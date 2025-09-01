@@ -6,7 +6,12 @@ let audio, fft;
 let mode = "normal"; // normal, outline, blink, mirror
 
 function preload() {
-  audio = loadSound("delos.mp3"); // asegúrate que esté en /visuales/assets/
+  // Asegúrate que el archivo esté en visuales/delos.mp3
+  song = loadSound("./delos.mp3",
+  () => console.log("Canción cargada ✔"),
+  () => console.error("Error cargando la canción ❌")
+);
+
 }
 
 function setup() {
