@@ -13,7 +13,7 @@ body {
 .card {
   background: #1a1a1a;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 200, 255, 0.3);
+  box-shadow: 0 0 20px #a3278f;
   padding: 30px 40px;
   text-align: center;
   z-index: 10; /* asegura que esté por encima de cualquier canvas */
