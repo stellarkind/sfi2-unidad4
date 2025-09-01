@@ -10,10 +10,11 @@ let isSongPlaying = false;
 
 function preload() {
   // Asegúrate que el archivo esté en visuales/delos.mp3
-  song = loadSound("delos.mp3", 
-    () => console.log("Canción cargada ✔"), 
-    () => console.error("Error cargando la canción ❌")
-  );
+  song = loadSound("./delos.mp3",
+  () => console.log("Canción cargada ✔"),
+  () => console.error("Error cargando la canción ❌")
+);
+
 }
 
 function setup() {

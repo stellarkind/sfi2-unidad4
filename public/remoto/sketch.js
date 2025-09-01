@@ -1,57 +1,22 @@
 let socket;
-let lastTouchX = null; 
-let lastTouchY = null; 
-const threshold = 5;
+let slider1, slider2;
 
 function setup() {
-    createCanvas(300, 400);
-    background(220);
+  noCanvas(); 
+  socket = io();
 
-    // Conectar al servidor de Socket.IO
-    //let socketUrl = 'http://localhost:3000';
-    socket = io();
+  socket.on('connect', () => console.log('Connected to server'));
+  socket.on('disconnect', () => console.log('Disconnected from server'));
 
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
-
-    socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
-    });
+  // Vincular sliders ya existentes en el HTML
+  slider1 = select('#slider1');
+  slider2 = select('#slider2');
 }
 
 function draw() {
-    background(220);
-    fill(255, 128, 0);
-    textAlign(CENTER, CENTER);
-    textSize(24);
-    text('Touch to change the color', width / 2, height / 2);
-}
-
-function touchMoved() {
-    if (socket && socket.connected) { 
-        let dx = abs(mouseX - lastTouchX);
-        let dy = abs(mouseY - lastTouchY);
-
-        if (dx > threshold || dy > threshold || lastTouchX === null) {
-            let touchData = {
-                type: 'color',
-                x: mouseX,
-                y: mouseY
-            };
-            socket.emit('message', JSON.stringify(touchData));
-
-            lastTouchX = mouseX;
-            lastTouchY = mouseY;
-        }
-    }
-    return false;
+  // Emitir datos al servidor desde los sliders HTML
+  if (socket && socket.connected) {
+    socket.emit("message", JSON.stringify({ type: "color-1", value: slider1.value() }));
+    socket.emit("message", JSON.stringify({ type: "color-2", value: slider2.value() }));
+  }
 }

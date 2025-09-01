@@ -1,49 +1,37 @@
 let socket;
-let circleX = 200;
-let circleY = 200;
-const port = 3000;
 
+window.onload = () => {
+  socket = io();
 
-function setup() {
-    createCanvas(300, 400);
-    background(220);
+  const buttons = {
+    normal: document.getElementById("normal"),
+    outline: document.getElementById("outline"),
+    blink: document.getElementById("blink"),
+    mirror: document.getElementById("mirror"),
+  };
 
-    //let socketUrl = 'http://localhost:3000';
-    socket = io(); 
+  function setActive(buttonId) {
+    Object.values(buttons).forEach(btn => btn.classList.remove("active"));
+    buttons[buttonId].classList.add("active");
+  }
 
-    // Evento de conexión exitosa
-    socket.on('connect', () => {
-        console.log('Connected to server');
-    });
+  buttons.normal.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "normal" }));
+    setActive("normal");
+  };
 
-    // Recibir mensaje del servidor
-    socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
-        try {
-            let parsedData = JSON.parse(data);
-            /*
-            if (parsedData && parsedData.type === 'touch') {
-                circleX = parsedData.x;
-                circleY = parsedData.y;
-            }
-            */
-        } catch (e) {
-            console.error("Error parsing received JSON:", e);
-        }
-    });    
+  buttons.outline.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "outline" }));
+    setActive("outline");
+  };
 
-    // Evento de desconexión
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
+  buttons.blink.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "blink" }));
+    setActive("blink");
+  };
 
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
-    });
-}
-
-function draw() {
-    background(220);
-    fill(255, 0, 0);
-    ellipse(circleX, circleY, 50, 50);
-}
+  buttons.mirror.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "mirror" }));
+    setActive("mirror");
+  };
+};
