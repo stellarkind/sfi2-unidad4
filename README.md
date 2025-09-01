@@ -1,22 +1,28 @@
-# Pasos para realizar los experimentos
+# Una brújula del silencio – Delos 
 
-Autor: Stella
-FEcha_ñsalkdlaksd
+Autor: Stella P.  
+Fecha de desarrollo: Agosto-septiembre 2025.  
 
-## Servidor
+## Sobre el proyecto
+Proyecto desarrollado bajo el marco de la clase Sistemas Físicos Interactivos 2, Universidad Pontificia Bolivariana. Utilizando como referente para el desarrollo visual la canción ***"Delos"*** del artista colombiano **Nerón Arkano**, quien es dueño de la totalidad de los derechos de dicha canción, utilizada en este proyecto con fines unicamente de **exploración académica**.
+  
+El concepto raiz de este proyecto parte de la idea del silencio como brújula interna, explorando cómo el vacío y la pausa permiten redescubrir el propio centro.
+  
+La experiencia se desarrolla en tres fases emocionales (*Desembarco, Santuario y Retorno Interior*), cada una representada por un estado visual generativo que evoluciona en sincronía con la música, la voz del artista y la interacción del público.
+  
+El sistema se materializa a través de una infraestructura técnica interactiva distribuida, donde múltiples clientes envían datos en tiempo real:
+- **Clientes móviles:** aportan información sensorial del público (palabras, movimiento).
+- **Cliente web:** captura inputs como micrófono, movimiento del mouse o teclado.
+- **Cliente remoto: permite controlar** parámetros y transiciones de estados.
+- **Servidor Node.js con Socket.IO:** integra y distribuye la comunicación en vivo entre todos los clientes.
+- **Visuales en p5.js:** interpretan los datos según las reglas Input-Process-Output diseñadas, transformándolos en campos lumínicos, constelaciones o nebulosas.
 
-Este proyecto implementa un servidor web al que añade funcionalidades de Websocket usando socket.io. 
-El servir gestionará las solicitudes de páginas web y además la conexión socket.io (websocket) con los 
-clientes. La tarea del servidor web es servir dos 
-posibles sitios: un sitio móvil y un sitio de escritorio. El sitio 
-móvil leerá la posición x,y del sensor touch del celular y la enviará al socket.io. 
-Si hay un cliente de escritorio corriendo el sitio web de escritorio, este podría recibir la información 
-del touch del cliente móvil. Con esta información, pintará un círculo en la posición x,y recibida. 
-De nuevo, la comunicación entre los dos sitios se realizará mediante socket.io.
+El propósito no es generar empatía (ponerse en el lugar del otro), sino propiciar epifanías colectivas e individuales, donde cada participante construye su propia revelación a través de su silencio, sus movimientos o sus palabras.
 
-* El archivo server.js contiene el código del servidor.
-* En la carpeta public están los dos sitios web: mobile y desktop.
+En conjunto, la propuesta combina arte generativo, narrativa nodal y agencia distribuida para crear un ritual contemporáneo de introspección compartida, en el que artista, público y sistema se transforman mutuamente.
 
+
+## Para probar la aplicación:
 Los pasos para ejecutar la aplicación son:
 
 * Clonar el repositorio.
