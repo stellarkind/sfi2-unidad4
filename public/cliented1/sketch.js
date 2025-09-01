@@ -1,33 +1,38 @@
 let socket;
 
-function setup() {
-    createCanvas(300, 200);
-    background(220);
-    socket = io();
+window.onload = () => {
+  socket = io();
 
-    socket.on('connect', () => {
-        console.log('Desktop control connected');
-    });
-}
+  const buttons = {
+    normal: document.getElementById("normal"),
+    outline: document.getElementById("outline"),
+    blink: document.getElementById("blink"),
+    mirror: document.getElementById("mirror"),
+  };
 
-function draw() {
-    background(220);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    textSize(16);
-    text('Press 1 = Normal\nPress 2 = Outline\nPress 3 = Blink\nPress 4 = Mirror', width/2, height/2);
-}
+  function setActive(buttonId) {
+    Object.values(buttons).forEach(btn => btn.classList.remove("active"));
+    buttons[buttonId].classList.add("active");
+  }
 
-function keyPressed() {
-    if (socket && socket.connected) {
-        if (key === '1') {
-            socket.emit('message', JSON.stringify({ type: 'effect', value: 'normal' }));
-        } else if (key === '2') {
-            socket.emit('message', JSON.stringify({ type: 'effect', value: 'outline' }));
-        } else if (key === '3') {
-            socket.emit('message', JSON.stringify({ type: 'effect', value: 'blink' }));
-        } else if (key === '4') {
-            socket.emit('message', JSON.stringify({ type: 'effect', value: 'mirror' }));
-        }
-    }
-}
+  buttons.normal.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "normal" }));
+    setActive("normal");
+  };
+
+  buttons.outline.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "outline" }));
+    setActive("outline");
+  };
+
+  buttons.blink.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "blink" }));
+    setActive("blink");
+  };
+
+  buttons.mirror.onclick = () => {
+    socket.emit("message", JSON.stringify({ type: "mode", value: "mirror" }));
+    setActive("mirror");
+  };
+};
+

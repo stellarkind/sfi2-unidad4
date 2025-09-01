@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.0/lib/p5.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="sketch.js"></script>
-    <title>Desktop Controller</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Visuales</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="sketch.js" defer></script>
 </head>
-<body></body>
+<body>
+  <div class="card">
+    <h2>🎛️ Control Visuales</h2>
+    <button id="normal" class="btn active">NORMAL</button>
+    <button id="outline" class="btn">OUTLINE</button>
+    <button id="blink" class="btn">BLINK</button>
+    <button id="mirror" class="btn">MIRROR</button>
+  </div>
+</body>
+
 </html>

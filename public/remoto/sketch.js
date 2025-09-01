@@ -1,19 +1,26 @@
 let socket;
 
 function setup() {
-  noCanvas();
+  noCanvas(); // 👈 Sin canvas, solo HTML
+
   socket = io();
 
-  let slider1 = select("#slider1");
-  let slider2 = select("#slider2");
+  socket.on("connect", () => console.log("✅ Conectado al servidor"));
+  socket.on("disconnect", () => console.log("❌ Desconectado del servidor"));
 
-  slider1.input(() => {
-    let hue = slider1.value();
-    socket.emit("message", JSON.stringify({ type: "color-1", hue }));
+  const slider1 = document.getElementById("slider1");
+  const slider2 = document.getElementById("slider2");
+
+  // Detectar cambios y enviar valores
+  slider1.addEventListener("input", () => {
+    if (socket && socket.connected) {
+      socket.emit("message", JSON.stringify({ type: "color-1", value: slider1.value }));
+    }
   });
 
-  slider2.input(() => {
-    let hue = slider2.value();
-    socket.emit("message", JSON.stringify({ type: "color-2", hue }));
+  slider2.addEventListener("input", () => {
+    if (socket && socket.connected) {
+      socket.emit("message", JSON.stringify({ type: "color-2", value: slider2.value }));
+    }
   });
 }
