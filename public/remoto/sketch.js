@@ -1,24 +1,26 @@
 let socket;
-let slider1, slider2;
 
 function setup() {
-  noCanvas();
+  noCanvas(); // 👈 Sin canvas, solo HTML
+
   socket = io();
 
-  // Slider 1 (Nave 1 - Azul/Naranja)
-  slider1 = createSlider(0, 255, 128);
-  slider1.id("slider1");
-  slider1.parent(document.body);
+  socket.on("connect", () => console.log("✅ Conectado al servidor"));
+  socket.on("disconnect", () => console.log("❌ Desconectado del servidor"));
 
-  // Slider 2 (Nave 2 - Rojo/Verde)
-  slider2 = createSlider(0, 255, 128);
-  slider2.id("slider2");
-  slider2.parent(document.body);
-}
+  const slider1 = document.getElementById("slider1");
+  const slider2 = document.getElementById("slider2");
 
-function draw() {
-  if (socket && socket.connected) {
-    socket.emit("message", JSON.stringify({ type: "color-1", value: slider1.value() }));
-    socket.emit("message", JSON.stringify({ type: "color-2", value: slider2.value() }));
-  }
+  // Detectar cambios y enviar valores
+  slider1.addEventListener("input", () => {
+    if (socket && socket.connected) {
+      socket.emit("message", JSON.stringify({ type: "color-1", value: slider1.value }));
+    }
+  });
+
+  slider2.addEventListener("input", () => {
+    if (socket && socket.connected) {
+      socket.emit("message", JSON.stringify({ type: "color-2", value: slider2.value }));
+    }
+  });
 }

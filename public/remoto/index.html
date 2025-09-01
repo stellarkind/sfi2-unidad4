@@ -1,24 +1,21 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Control Remoto</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-  </head>
-  <body>
-  <div id="panel">
-    <h2>Control de Colores</h2>
-    <label for="slider1">Nave 1 (Rojo)</label>
-    <input type="range" id="slider1" min="0" max="255" value="188">
-
-    <label for="slider2">Nave 2 (Verde)</label>
-    <input type="range" id="slider2" min="0" max="255" value="155">
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Colores</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="sketch.js" defer></script>
+</head>
+<body>
+  <div class="card">
+    <h2>🎨 Control de Colores</h2>
+    <p>Nave 1 (Azul → Verde)</p>
+    <input id="slider1" type="range" min="0" max="255" value="128" class="slider-blue" />
+    
+    <p>Nave 2 (Rojo → Morado)</p>
+    <input id="slider2" type="range" min="0" max="255" value="128" class="slider-red" />
   </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="sketch.js"></script>
 </body>
-
 </html>
