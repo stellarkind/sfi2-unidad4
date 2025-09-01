@@ -1,17 +1,9 @@
 let socket;
 
 function setup() {
-  createCanvas(300, 400);
-  background(30);
+  createCanvas(windowWidth, windowHeight);
   socket = io();
-}
-
-function draw() {
-  background(30);
-  fill(0, 200, 255);
-  textAlign(CENTER, CENTER);
-  textSize(22);
-  text("🚀 Nave 1\nMueve con tu dedo", width / 2, height / 2);
+  noCanvas(); // la UI ahora es solo HTML + CSS
 }
 
 function touchMoved() {
