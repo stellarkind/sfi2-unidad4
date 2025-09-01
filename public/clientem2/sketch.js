@@ -33,7 +33,7 @@ function draw() {
     fill(255, 128, 0);
     textAlign(CENTER, CENTER);
     textSize(24);
-    text('Touch to move the circle', width / 2, height / 2);
+    text('Touch to move the rectangle', width / 2, height / 2);
 }
 
 function touchMoved() {

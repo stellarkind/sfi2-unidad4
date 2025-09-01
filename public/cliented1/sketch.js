@@ -15,7 +15,7 @@ function draw() {
     fill(0);
     textAlign(CENTER, CENTER);
     textSize(16);
-    text('Press 1 = Normal\nPress 2 = Outline\nPress 3 = Blink', width/2, height/2);
+    text('Press 1 = Normal\nPress 2 = Outline\nPress 3 = Blink\nPress 4 = Mirror', width/2, height/2);
 }
 
 function keyPressed() {
@@ -26,6 +26,8 @@ function keyPressed() {
             socket.emit('message', JSON.stringify({ type: 'effect', value: 'outline' }));
         } else if (key === '3') {
             socket.emit('message', JSON.stringify({ type: 'effect', value: 'blink' }));
+        } else if (key === '4') {
+            socket.emit('message', JSON.stringify({ type: 'effect', value: 'mirror' }));
         }
     }
 }

@@ -57,20 +57,31 @@ function draw() {
         noStroke();
         ellipse(circleX, circleY, 50, 50);
         rect(squareX, squareY, 100, 50);
-    } 
-    else if (currentEffect === 'outline') {
+
+    } else if (currentEffect === 'outline') {
         noFill();
         stroke(purple);
-        strokeWeight(3);
+        strokeWeight(4);
         ellipse(circleX, circleY, 60, 60);
         rect(squareX, squareY, 100, 50);
-    } 
-    else if (currentEffect === 'blink') {
+
+    } else if (currentEffect === 'blink') {
         if (frameCount % 30 < 15) {
             fill(purple);
             noStroke();
             ellipse(circleX, circleY, 50, 50);
             rect(squareX, squareY, 100, 50);
         }
+
+    } else if (currentEffect === 'mirror') {
+        // Dibuja las figuras normales
+        fill(purple);
+        noStroke();
+        ellipse(circleX, circleY, 50, 50);
+        rect(squareX, squareY, 100, 50);
+
+        // Dibuja copias espejadas
+        ellipse(width - circleX, circleY, 50, 50);
+        rect(width - squareX - 100, squareY, 100, 50);
     }
 }
