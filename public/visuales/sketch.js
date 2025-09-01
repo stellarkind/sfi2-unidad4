@@ -1,49 +1,61 @@
 let socket;
 let circleX = 200;
 let circleY = 200;
-const port = 3000;
-
+let circleSize = 50;
+let currentEffect = 'normal';
+let currentColor = [255, 0, 0];
 
 function setup() {
-    createCanvas(300, 400);
+    createCanvas(600, 400);
     background(220);
 
-    //let socketUrl = 'http://localhost:3000';
     socket = io(); 
 
-    // Evento de conexión exitosa
     socket.on('connect', () => {
         console.log('Connected to server');
     });
 
-    // Recibir mensaje del servidor
     socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
         try {
             let parsedData = JSON.parse(data);
-            /*
-            if (parsedData && parsedData.type === 'touch') {
+
+            if (parsedData.type === 'touch') {
                 circleX = parsedData.x;
                 circleY = parsedData.y;
             }
-            */
+            if (parsedData.type === 'touch-2') {
+                circleSize = map(parsedData.x, 0, width, 30, 100);
+            }
+            if (parsedData.type === 'color') {
+                currentColor = [random(255), random(255), random(255)];
+            }
+            if (parsedData.type === 'effect') {
+                currentEffect = parsedData.value;
+            }
         } catch (e) {
             console.error("Error parsing received JSON:", e);
         }
-    });    
-
-    // Evento de desconexión
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
     });
 }
 
 function draw() {
-    background(220);
-    fill(255, 0, 0);
-    ellipse(circleX, circleY, 50, 50);
+    background(20);
+
+    if (currentEffect === 'normal') {
+        fill(...currentColor);
+        ellipse(circleX, circleY, circleSize, circleSize);
+    } 
+    else if (currentEffect === 'waves') {
+        noFill();
+        stroke(...currentColor);
+        for (let i = 0; i < 5; i++) {
+            ellipse(circleX, circleY, circleSize + i*20, circleSize + i*20);
+        }
+    } 
+    else if (currentEffect === 'blink') {
+        if (frameCount % 30 < 15) {
+            fill(...currentColor);
+            ellipse(circleX, circleY, circleSize, circleSize);
+        }
+    }
 }

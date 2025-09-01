@@ -1,49 +1,31 @@
 let socket;
-let circleX = 200;
-let circleY = 200;
-const port = 3000;
-
 
 function setup() {
-    createCanvas(300, 400);
+    createCanvas(300, 200);
     background(220);
+    socket = io();
 
-    //let socketUrl = 'http://localhost:3000';
-    socket = io(); 
-
-    // Evento de conexión exitosa
     socket.on('connect', () => {
-        console.log('Connected to server');
-    });
-
-    // Recibir mensaje del servidor
-    socket.on('message', (data) => {
-        console.log(`Received message: ${data}`);
-        try {
-            let parsedData = JSON.parse(data);
-            /*
-            if (parsedData && parsedData.type === 'touch') {
-                circleX = parsedData.x;
-                circleY = parsedData.y;
-            }
-            */
-        } catch (e) {
-            console.error("Error parsing received JSON:", e);
-        }
-    });    
-
-    // Evento de desconexión
-    socket.on('disconnect', () => {
-        console.log('Disconnected from server');
-    });
-
-    socket.on('connect_error', (error) => {
-        console.error('Socket.IO error:', error);
+        console.log('Desktop control connected');
     });
 }
 
 function draw() {
     background(220);
-    fill(255, 0, 0);
-    ellipse(circleX, circleY, 50, 50);
+    fill(0);
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    text('Press 1 = Normal\nPress 2 = Waves\nPress 3 = Blink', width/2, height/2);
+}
+
+function keyPressed() {
+    if (socket && socket.connected) {
+        if (key === '1') {
+            socket.emit('message', JSON.stringify({ type: 'effect', value: 'normal' }));
+        } else if (key === '2') {
+            socket.emit('message', JSON.stringify({ type: 'effect', value: 'waves' }));
+        } else if (key === '3') {
+            socket.emit('message', JSON.stringify({ type: 'effect', value: 'blink' }));
+        }
+    }
 }
