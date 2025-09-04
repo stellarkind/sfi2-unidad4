@@ -3,6 +3,7 @@ let slider1, slider2;
 let card, title, label1, label2;
 
 function setup() {
+  console.log("Setup remote");
   noCanvas(); // no usamos canvas aquí
   socket = io();
 
