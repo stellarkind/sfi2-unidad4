@@ -1,16 +1,17 @@
 let socket;
-let ship1 = { x: 150, y: 200, color: [0, 180, 255] };   // Azul inicial
-let ship2 = { x: 100, y: 100, color: [255, 80, 80] };   // Rojo inicial
+let ship1 = { x: 150, y: 200, color: [0, 200, 255], visible: true };
+let ship2 = { x: 100, y: 100, color: [255, 100, 150], visible: true };
 
 let song, fft;
 let mode = "normal"; // normal, outline, blink, mirror
-let isSongPlaying = false;
+let blinkCounter = 0;
+let phase = 1; // fase emocional actual
+let tunnel = [];
 
 function preload() {
-  // Asegúrate que el archivo esté en visuales/delos.mp3
-  song = loadSound("delos.mp3",
-    () => console.log("🎵 Canción cargada ✔"),
-    () => console.error("❌ Error cargando la canción")
+  song = loadSound("./delos.mp3",
+    () => console.log("Canción cargada ✔"),
+    () => console.error("Error cargando la canción ❌")
   );
 }
 
@@ -18,9 +19,14 @@ function setup() {
   createCanvas(600, 600);
   fft = new p5.FFT();
 
+  // Iniciar túnel
+  for (let i = 0; i < 20; i++) {
+    tunnel.push({ size: i * 40 + 20, sides: int(random([4, 6, 8])) });
+  }
+
   socket = io();
 
-  socket.on("connect", () => console.log("Connected to server"));
+  socket.on("connect", () => console.log("✅ Connected to server"));
 
   socket.on("message", (data) => {
     try {
@@ -33,14 +39,13 @@ function setup() {
         ship2.x = parsed.x;
         ship2.y = parsed.y;
       } else if (parsed.type === "color-1") {
-        // Control de color Nave 1 (azul-verde)
-        ship1.color = [0, parsed.value, 255 - parsed.value / 2];
+        ship1.color = [parsed.value, 200, 255 - parsed.value];
       } else if (parsed.type === "color-2") {
-        // Control de color Nave 2 (rojo-morado)
-        ship2.color = [255 - parsed.value / 2, 0, parsed.value];
+        ship2.color = [255, parsed.value, 200];
       } else if (parsed.type === "mode") {
         mode = parsed.value;
       }
+
     } catch (e) {
       console.error("Error parsing message:", e);
     }
@@ -48,35 +53,79 @@ function setup() {
 }
 
 function draw() {
-  if (!isSongPlaying) {
-    background(0);
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(24);
-    text("Haz clic para iniciar la canción", width / 2, height / 2);
-    return;
-  }
+  background(0);
 
   let spectrum = fft.analyze();
   let bass = fft.getEnergy("bass");
 
-  // Fondo dinámico según graves
-  let bgCol = map(bass, 0, 255, 20, 120);
-  background(bgCol, 50, bgCol);
-
-  // Blink: parpadeo
-  if (mode === "blink" && bass > 180) {
-    background(255);
+  // Detectar fase por tiempo de canción
+  if (song.isPlaying()) {
+    let t = song.currentTime();
+    if (t < 80) phase = 1;
+    else if (t < 140) phase = 2;
+    else phase = 3;
   }
 
-  if (mode === "mirror") {
-    translate(width, 0);
-    scale(-1, 1);
+  // Paleta según fase
+  let tunnelColor;
+  if (phase === 1) tunnelColor = color(0, 200, 255);   // azul/verde
+  if (phase === 2) tunnelColor = color(160, 0, 200);   // morado/cian
+  if (phase === 3) tunnelColor = color(255, 50, 100);  // rojo/magenta
+
+  // Dibujar túnel
+  push();
+  translate(width / 2, height / 2);
+  stroke(tunnelColor);
+  noFill();
+
+  for (let t of tunnel) {
+    beginShape();
+    for (let i = 0; i < t.sides; i++) {
+      let angle = map(i, 0, t.sides, 0, TWO_PI);
+      let x = cos(angle) * t.size;
+      let y = sin(angle) * t.size;
+      vertex(x, y);
+    }
+    endShape(CLOSE);
+
+    // Crecimiento reactivo a graves
+    t.size += map(bass, 0, 255, 1, 6);
+
+    if (t.size > width * 1.5) {
+      t.size = 20;
+      t.sides = int(random([4, 6, 8]));
+    }
+  }
+  pop();
+
+  // BLINK → solo naves
+  if (mode === "blink") {
+    blinkCounter++;
+    if (blinkCounter % 15 === 0) {
+      ship1.visible = !ship1.visible;
+      ship2.visible = !ship2.visible;
+    }
+  } else {
+    ship1.visible = true;
+    ship2.visible = true;
   }
 
   // Dibujar naves
-  drawShip(ship1.x, ship1.y, ship1.color);
-  drawShip(ship2.x, ship2.y, ship2.color);
+  if (ship1.visible) drawShip(ship1.x, ship1.y, ship1.color);
+  if (ship2.visible) drawShip(ship2.x, ship2.y, ship2.color);
+
+  // MIRROR → duplicar naves
+  if (mode === "mirror") {
+    if (ship1.visible) drawShip(width - ship1.x, ship1.y, ship1.color);
+    if (ship2.visible) drawShip(width - ship2.x, ship2.y, ship2.color);
+  }
+
+  // Debug de fase
+  noStroke();
+  fill(255);
+  textSize(16);
+  textAlign(LEFT, TOP);
+  text("Fase: " + phase, 10, 10);
 }
 
 function drawShip(x, y, col) {
@@ -92,6 +141,7 @@ function drawShip(x, y, col) {
     fill(col);
   }
 
+  // Triángulo como nave minimalista
   beginShape();
   vertex(0, -20);
   vertex(-15, 15);
@@ -101,18 +151,9 @@ function drawShip(x, y, col) {
   pop();
 }
 
-// Reproducir canción al primer clic
+// Reproducir canción al clic
 function mousePressed() {
-  if (!isSongPlaying) {
+  if (!song.isPlaying()) {
     song.loop();
-    isSongPlaying = true;
   }
-}
-
-// Control rápido desde teclado
-function keyPressed() {
-  if (key === "1") mode = "normal";
-  if (key === "2") mode = "outline";
-  if (key === "3") mode = "blink";
-  if (key === "4") mode = "mirror";
 }
